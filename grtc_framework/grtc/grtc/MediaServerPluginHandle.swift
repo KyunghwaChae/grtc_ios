@@ -507,7 +507,7 @@ open class MediaServerPluginHandle {
             
             var obj = JSON()
             obj["sdp"].string = _my_sdp.sdp
-            obj["type"].string = _my_sdp.type == RTCSdpType.offer ? "offer" : "anwser"
+            obj["type"].string = _my_sdp.type == RTCSdpType.offer ? "offer" : "answer"
             callbacks.onSuccess(obj)
         }
     }

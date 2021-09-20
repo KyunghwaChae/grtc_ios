@@ -60,14 +60,14 @@ open class MediaServerRestAPI : IMediaServerMessenger {
             .responseJSON { response in
                 switch response.result {
                 case .success(let value):
+                    self.waitPoll = false
                     let json = JSON(value)
                     for (_,subJson): (String, JSON) in json {
                         self.receivedMessage(subJson)
                     }
-                    self.waitPoll = false
                 case .failure(let error):
-                    self.handler.onError(error.localizedDescription)
                     self.waitPoll = false
+                    self.handler.onError(error.localizedDescription)
                 }
             }
         

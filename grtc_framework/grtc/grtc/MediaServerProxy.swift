@@ -333,11 +333,13 @@ public class MediaServerProxy {
                     _parent._my_id = msg["id"].int64
                     publishOwnFeed()
                     if msg["publishers"].exists() {
-                        let pubs: [JSON] = msg["publisher"].arrayValue
-                        for pub in pubs {
-                            let tehId: Int64! = pub["id"].int64
-                            let code: String! = pub["display"].string
-                            newRemoteFeed(tehId, code, true)
+                        
+                        if let pubs: [JSON] = msg["publishers"].array {
+                            for pub in pubs {
+                                let tehId: Int64! = pub["id"].int64
+                                let code: String! = pub["display"].string
+                                newRemoteFeed(tehId, code, true)
+                            }
                         }
                     }
                     if _parent._as_manager {
