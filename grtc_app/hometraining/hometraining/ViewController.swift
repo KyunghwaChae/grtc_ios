@@ -20,12 +20,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view."
         roomid.text = "123456"
-        participantType.selectedSegmentIndex = 0
-        participantCode.text = "teacher"
+        participantType.selectedSegmentIndex = 1
+        participantCode.text = "aaa"
         width.text = "640"
         height.text = "480"
-        bitrate.text = "2"
-        participantCodes.text = "aaa;bbb;ccc;ddd;eee;fff;ggg;hhh"
+        bitrate.text = "1"
+        participantCodes.text = "teacher"
 //        participantCodes.text = "aaa"
     }
 

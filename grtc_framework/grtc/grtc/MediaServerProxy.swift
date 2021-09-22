@@ -42,8 +42,8 @@ public class MediaServerProxy {
     public init(_ localRenderer: RTCVideoRenderer!, _ remoteRenderers: [RTCVideoRenderer], _ remoteCodes: [String], _ mediaServerUri: String!, _ code: String!, _ roomId: Int32, _ width: Int32, _ height: Int32, _ fps: Int32, _ vbitrateMbps: Int32, _ asManager: Bool, _ observer: MediaServerProxyObserver!) {
         
         _local_renderer = localRenderer
-        for (index, remoteRenderer) in remoteRenderers.enumerated() {
-            _remote_codes_renderers[remoteCodes[index]] = remoteRenderer
+        for (index, value) in remoteCodes.enumerated() {
+            _remote_codes_renderers[value] = remoteRenderers[index]
         }
         _media_server_uri = mediaServerUri
         _code = code
