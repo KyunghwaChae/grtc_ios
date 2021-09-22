@@ -103,26 +103,57 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
     }
     
     func onCreatedRoom(_ sessionId: Int64!, _ publishId: Int64!) {
-        
+        DispatchQueue.main.async {
+            let message = "Room is Created"
+            let alert = UIAlertController(title: "onCreatedRoom", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     func onJoinedRoom(_ sessionId: Int64!, _ publishId: Int64!) {
-    
+        DispatchQueue.main.async {
+            let message = "Joined to Room"
+            let alert = UIAlertController(title: "onJoinedRoom", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     func onLeaveRoom(_ publishId: Int64!, _ code: String!) {
-        
+        DispatchQueue.main.async {
+            let message = "\(code!) leaved the room"
+            let alert = UIAlertController(title: "onLeaveRoom", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     func onPublish(_ publishId: Int64!, _ code: String!) {
-        
+        DispatchQueue.main.async {
+            let message = "\(code!) start publishing"
+            let alert = UIAlertController(title: "onPublish", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     func onUnpublish(_ publishId: Int64!, _ code: String!) {
-        
+        DispatchQueue.main.async {
+            let message = "\(code!) stop publishing"
+            let alert = UIAlertController(title: "onUnpublish", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     func onVideo(_ code: String!, _ enable: Bool!) {
         
+        DispatchQueue.main.async {
+            let message = "\(code!)'s' video is " + (enable ? "enabled" : "disabled")
+            let alert = UIAlertController(title: "onVideo", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
 }

@@ -179,10 +179,25 @@ public class MediaServerProxy {
             _parent._remote_ms[_feedid] = stream
         }
 
-        public func onDataOpen(_ data: AnyObject!) {
+        public func onDataOpen(_ data: Any!) {
         }
 
-        public func onData(_ data: AnyObject!) {
+        public func onData(_ data: Any!) {
+            let json = data as! JSON
+            if json["camera"].exists() {
+                let camera = json["camera"]
+                if camera["code"].exists() {
+                    let code = camera["code"].string
+                    let enable = camera["enable"].bool
+                    if let observer = _parent._observer {
+                        
+                        let handler = DispatchQueue(label: "kr.co.grib.onvideo", qos: .userInteractive)
+                        handler.async {
+                            observer.onVideo(code, enable)
+                        }
+                    }
+                }
+            }
         }
 
         public func onCleanup() {
@@ -302,9 +317,12 @@ public class MediaServerProxy {
                 if _parent._remote_codes[id] == nil {
                     _parent._remote_codes[id] = code
                 }
-                if _parent._observer != nil {
-                    _parent._observer.onPublish(id, code)
-                    _parent._observer.onVideo(code, bVideo)
+                if let observer = _parent._observer {
+                    let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                    handler.async {
+                        observer.onPublish(id, code)
+                        observer.onVideo(code, bVideo)
+                    }
                 }
                 _parent._media_server.Attach(SubscriberAttachCallbacks(id, myrenderer, _parent))
             }
@@ -344,11 +362,17 @@ public class MediaServerProxy {
                     }
                     if _parent._as_manager {
                         if let observer = _parent._observer {
-                            observer.onCreatedRoom(_parent._media_server.getSessionId(), _parent._my_id)
+                            let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                            handler.async {
+                                observer.onCreatedRoom(self._parent._media_server.getSessionId(), self._parent._my_id)
+                            }
                         }
                     } else {
                         if let observer = _parent._observer {
-                            observer.onJoinedRoom(_parent._media_server.getSessionId(), _parent._my_id)
+                            let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                            handler.async {
+                                observer.onJoinedRoom(self._parent._media_server.getSessionId(), self._parent._my_id)
+                            }
                         }
                     }
                 } else {
@@ -366,21 +390,31 @@ public class MediaServerProxy {
                             } else {
                                 if msg["leaving"].exists() {
                                     if let id = msg["leaving"].int64 {
-                                        if _parent._remote_renderers[id] != nil {
+                                        if _parent._remote_renderers.keys.contains(id) {
                                             _parent._remote_renderers.removeValue(forKey: id)
                                         }
-                                        _parent._media_server.Detach(id)
+
                                         if let observer = _parent._observer {
-                                            observer.onLeaveRoom(id, _parent._remote_codes[id])
+                                            let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                                            handler.async {
+                                                if self._parent._remote_codes.keys.contains(id) {
+                                                    observer.onLeaveRoom(id, self._parent._remote_codes[id])
+                                                }
+                                            }
                                         }
+                                        _parent._media_server.Detach(id)
                                     }
                                 } else {
                                     if msg["unpublished"].exists() {
                                         if let id = msg["unpublished"].int64 {
                                             if let observer = _parent._observer {
-                                                observer.onUnpublish(id, _parent._remote_codes[id])
+                                                let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                                                handler.async {
+                                                    if self._parent._remote_codes.keys.contains(id) {
+                                                        observer.onUnpublish(id, self._parent._remote_codes[id])
+                                                    }
+                                                }
                                             }
-
                                         }
                                     } else {
                                         if msg["error_code"].exists() {
@@ -411,10 +445,10 @@ public class MediaServerProxy {
             NSLog("[MediaServerProxy] onRemoteStream\n");
         }
 
-        public func onDataOpen(_ data: AnyObject!) {
+        public func onDataOpen(_ data: Any!) {
         }
 
-        public func onData(_ data: AnyObject!) {
+        public func onData(_ data: Any!) {
         }
 
         public func onCleanup() {

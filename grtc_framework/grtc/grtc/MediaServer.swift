@@ -28,7 +28,6 @@ open class MediaServer : IMediaServerMessageObserver, IMediaServerSessionCreatio
     private var _connected: Bool!
     private var _server_connection: IMediaServerMessenger!
     private var _keep_alive: DispatchQueue!
-    //private var _run: Bool! = false
 
     public init(_ gatewayCallbacks: IMediaServerGatewayCallbacks!) {
         _gateway_observer = gatewayCallbacks
@@ -155,12 +154,19 @@ open class MediaServer : IMediaServerMessageObserver, IMediaServerSessionCreatio
     }
 
     open func Detach(_ id: Int64!) {
-        _attached_plugins_lock.lock(); defer {_attached_plugins_lock.unlock() }
-        for (k, v) in _attached_plugins {
-            if v.getFeedId()==id {
-                v.detach()
-                _attached_plugins.removeValue(forKey: k)
+        var attachedPlugin: MediaServerPluginHandle?
+        
+        do {
+            _attached_plugins_lock.lock(); defer {_attached_plugins_lock.unlock() }
+            for (_, v) in _attached_plugins {
+                if v.getFeedId()==id {
+                    attachedPlugin = v
+                }
             }
+        }
+        
+        if let v = attachedPlugin {
+            v.detach()
         }
     }
 

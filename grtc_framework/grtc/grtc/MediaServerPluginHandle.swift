@@ -9,25 +9,10 @@ import Foundation
 import SwiftyJSON
 import WebRTC
 
-protocol WebRTCObserver: AnyObject {
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange stateChanged: RTCSignalingState)
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState)
-    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState)
-    func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate)
-    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate])
-    func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream)
-    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream)
-    func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel)
-    func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection)
-}
-
 open class MediaServerPluginHandle: NSObject {
-    weak var _pc_delegate: WebRTCObserver?
-    
     private let TAG: String! = "MediaServerPluginHandle"
 
     private var _started: Bool = false
-    //private var _my_stream: RTCMediaStream! = nil
     private var _video_track: RTCVideoTrack! = nil
     private var _audio_track: RTCAudioTrack! = nil
     private var _remote_stream: RTCMediaStream! = nil
@@ -94,11 +79,11 @@ open class MediaServerPluginHandle: NSObject {
         _callbacks.onRemoteStream(stream)
     }
 
-    open func onDataOpen(_ data: AnyObject!) {
+    open func onDataOpen(_ data: Any!) {
         _callbacks.onDataOpen(data)
     }
 
-    open func onData(_ data: AnyObject!) {
+    open func onData(_ data: Any!) {
         _callbacks.onData(data)
     }
 
@@ -152,6 +137,7 @@ open class MediaServerPluginHandle: NSObject {
             if code.count > 0 {
                 let config = RTCDataChannelConfiguration()
                 _data_channel = _pc.dataChannel(forLabel: code, configuration: config)
+                _data_channel.delegate = self
             }
         }
         
@@ -175,7 +161,7 @@ open class MediaServerPluginHandle: NSObject {
                     return;
                 }
                 
-                print("Succeed to set remote offer SDP")
+                //print("Succeed to set remote offer SDP")
                 if self._my_sdp == nil {
                     self.createSdpInternal(callbacks, false)
                 }
@@ -219,7 +205,7 @@ open class MediaServerPluginHandle: NSObject {
                         return;
                     }
                     
-                    print("Succeed to set remote offer SDP")
+                    //print("Succeed to set remote offer SDP")
                     if self._my_sdp == nil {
                         self.createSdpInternal(callbacks, false)
                     }
@@ -303,20 +289,18 @@ open class MediaServerPluginHandle: NSObject {
         
         if isOffer {
             _pc.offer(for: _sdp_constraints) { (sdp, error) in
-                //RTCCreateSessionDescriptionCompletionHandler
                 if let err = error {
                     print("failed in creating offer")
                     //print(err)
                     callbacks.onCallbackError("failed in creating offer : \(err)")
-                    return
+                    return//
                 }
                 
-                print("succeed in creating offer")
+                //print("succeed in creating offer")
                 self.onLocalSdp(sdp, callbacks)
             }
         } else {
             _pc.answer(for: _sdp_constraints) { (sdp, error) in
-                //RTCCreateSessionDescriptionCompletionHandler
                 if let err = error {
                     print("failed in creating answer")
                     //print(err)
@@ -324,7 +308,7 @@ open class MediaServerPluginHandle: NSObject {
                     return
                 }
                 
-                print("succeed in creating answer")
+                //print("succeed in creating answer")
                 self.onLocalSdp(sdp, callbacks)
             }
         }
@@ -357,7 +341,7 @@ open class MediaServerPluginHandle: NSObject {
                         return;
                     }
                     
-                    print("Succeed to set remote offer SDP")
+                    //print("Succeed to set remote offer SDP")
                     if self._my_sdp == nil {
                         self.createSdpInternal(callbacks, false)
                     }
@@ -401,7 +385,6 @@ open class MediaServerPluginHandle: NSObject {
             if _my_sdp == nil {
                 _my_sdp = sdp
                 _pc.setLocalDescription(sdp) { (error) in
-                    //RTCSetSessionDescriptionCompletionHandler
                     if let err = error {
                         print("failed to set local sdp")
                         //print(err)
@@ -409,7 +392,7 @@ open class MediaServerPluginHandle: NSObject {
                         return;
                     }
                     
-                    print("succeed to set local sdp")
+                    //print("succeed to set local sdp")
                     if self._my_sdp == nil {
                         self.createSdpInternal(callbacks, false)
                     }
@@ -540,10 +523,34 @@ extension MediaServerPluginHandle: RTCPeerConnectionDelegate {
     }
     
     public func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
-        
+        print("peerDataChannel did open")
+        _data_channel = dataChannel
+        _data_channel.delegate = self
     }
     
     public func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
         print("peerConnection should negotiate")
     }
+    
+    
+}
+
+extension MediaServerPluginHandle: RTCDataChannelDelegate {
+    public func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
+        
+    }
+    
+    public func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer) {
+        if buffer.isBinary {
+            return
+        }
+        do {
+            let data = try JSON(data: buffer.data)
+            _callbacks.onData(data)
+        } catch {
+            print("exception occur in processing data on data channel")
+        }
+    }
+    
+    
 }

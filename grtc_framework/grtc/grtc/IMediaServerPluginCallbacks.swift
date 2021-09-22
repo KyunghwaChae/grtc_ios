@@ -14,8 +14,8 @@ public protocol IMediaServerPluginCallbacks : IMediaServerCallbacks {
     func onMessage(_ msg: JSON!, _ jsep: JSON!)
     func onLocalVideoTrack(_ track: RTCVideoTrack!)
     func onRemoteStream(_ stream: RTCMediaStream!)
-    func onDataOpen(_ data: AnyObject!)
-    func onData(_ data: AnyObject!)
+    func onDataOpen(_ data: Any!)
+    func onData(_ data: Any!)
     func onCleanup()
     func onDetached()
     func getFeedId() -> Int64!
