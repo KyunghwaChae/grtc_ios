@@ -9,7 +9,21 @@ import Foundation
 import SwiftyJSON
 import WebRTC
 
-open class MediaServerPluginHandle {
+protocol WebRTCObserver: AnyObject {
+    func peerConnection(_ peerConnection: RTCPeerConnection, didChange stateChanged: RTCSignalingState)
+    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState)
+    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState)
+    func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate)
+    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate])
+    func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream)
+    func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream)
+    func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel)
+    func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection)
+}
+
+open class MediaServerPluginHandle: NSObject {
+    weak var _pc_delegate: WebRTCObserver?
+    
     private let TAG: String! = "MediaServerPluginHandle"
 
     private var _started: Bool = false
@@ -25,6 +39,7 @@ open class MediaServerPluginHandle {
     private var _trickle: Bool = true
     private var _ice_done: Bool = false
     private var _sdp_sent: Bool = false
+    private var _sdp_cbks: IPluginHandleWebRTCCallbacks! = nil
     
     private var _code: String! = nil
     private var _width: Int32 = 0
@@ -42,100 +57,6 @@ open class MediaServerPluginHandle {
     private let AUDIO_TRACK_ID: String! = "ARDAMSa0"
     private let LOCAL_MEDIA_ID: String! = "ARDAMS"
     
-    
-    internal class WebRTCObserver: NSObject, RTCPeerConnectionDelegate {
-        private var _parent: MediaServerPluginHandle! = nil
-        private let _webrtc_cbs: IPluginHandleWebRTCCallbacks!
-        init(_ callbacks: IPluginHandleWebRTCCallbacks!, _ parent: MediaServerPluginHandle) {
-            _webrtc_cbs = callbacks
-            _parent = parent;
-        }
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didChange stateChanged: RTCSignalingState) {
-            switch (stateChanged) {
-            case .stable:
-                print("peerConnection new signaling state: stable")
-            case .haveLocalOffer:
-                print("peerConnection new signaling state: haveLocalOffer")
-            case .haveLocalPrAnswer:
-                print("peerConnection new signaling state: haveLocalPrAnswer")
-            case .haveRemoteOffer:
-                print("peerConnection new signaling state: haveRemoteOffer")
-            case .haveRemotePrAnswer:
-                print("peerConnection new signaling state: haveRemktePrAnswer")
-            case .closed:
-                print("peerConnection new signaling state: closed")
-            default:
-                break
-            }
-        }
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
-            switch (newState) {
-            case .disconnected:
-                print("peerConnection new ice connection state: disconnected")
-            case .connected:
-                print("peerConnection new ice connection state: connected")
-            case .new:
-                print("peerConnection new ice connection state: new")
-            case .checking:
-                print("peerConnection new ice connection state: checking")
-            case .closed:
-                print("peerConnection new ice connection state: closed")
-            case .failed:
-                print("peerConnection new ice connection state: failed")
-            default:
-                break
-            }
-        }
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
-            switch (newState) {
-            case .new:
-                break
-            case .gathering:
-                break
-            case .complete:
-                if _parent._trickle == false {
-                    _parent._my_sdp = _parent._pc.localDescription
-                    _parent.sendSdp(_webrtc_cbs)
-                } else {
-                    _parent.sendTrickleCandidate(nil)
-                }
-            default:
-                break
-            }
-            print("peerConnection new gathering state: \(newState)")
-        }
-        
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
-            if _parent._trickle == true {
-                _parent.sendTrickleCandidate(candidate)
-            }
-        }
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {
-        }
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {
-            print("peerConnection did add stream")
-            _parent._remote_stream = stream
-            _parent.onRemoteStream(stream)
-        }
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream) {
-            print("peerConnection did remove stream")
-        }
-        
-        func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
-            
-        }
-        
-        func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
-            print("peerConnection should negotiate")
-        }
-    }
 
     public init(_ server: MediaServer!, _ code: String!, _ plugin: MediaServerSupportedPluginPackages!, _ handle_id: Int64!, _ callbacks: IMediaServerPluginCallbacks!, _ width: Int32, _ height: Int32, _ fps: Int32) {
         _server = server
@@ -219,7 +140,7 @@ open class MediaServerPluginHandle {
         rtcConfig.continualGatheringPolicy = RTCContinualGatheringPolicy.gatherContinually
         rtcConfig.keyType = RTCEncryptionKeyType.ECDSA
         
-        _pc = _session_factory.peerConnection(with: rtcConfig, constraints: _pc_constraints, delegate: nil)
+        _pc = _session_factory.peerConnection(with: rtcConfig, constraints: _pc_constraints, delegate: self)
         if let videoTrack = _video_track {
             _pc.add(videoTrack, streamIds: [VIDEO_TRACK_ID])
         }
@@ -260,9 +181,6 @@ open class MediaServerPluginHandle {
                 }
             }
         }
-        
-        let observer = WebRTCObserver(callbacks, self)
-        _pc.delegate = observer
     }
 
     open func createOffer(_ webrtcCallbacks: IPluginHandleWebRTCCallbacks!) {
@@ -539,5 +457,93 @@ open class MediaServerPluginHandle {
                 callbacks.onSuccess(obj)
             }
         }
+    }
+}
+
+extension MediaServerPluginHandle: RTCPeerConnectionDelegate {
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didChange stateChanged: RTCSignalingState) {
+        switch (stateChanged) {
+        case .stable:
+            print("peerConnection new signaling state: stable")
+        case .haveLocalOffer:
+            print("peerConnection new signaling state: haveLocalOffer")
+        case .haveLocalPrAnswer:
+            print("peerConnection new signaling state: haveLocalPrAnswer")
+        case .haveRemoteOffer:
+            print("peerConnection new signaling state: haveRemoteOffer")
+        case .haveRemotePrAnswer:
+            print("peerConnection new signaling state: haveRemktePrAnswer")
+        case .closed:
+            print("peerConnection new signaling state: closed")
+        default:
+            break
+        }
+    }
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
+        switch (newState) {
+        case .disconnected:
+            print("peerConnection new ice connection state: disconnected")
+        case .connected:
+            print("peerConnection new ice connection state: connected")
+        case .new:
+            print("peerConnection new ice connection state: new")
+        case .checking:
+            print("peerConnection new ice connection state: checking")
+        case .closed:
+            print("peerConnection new ice connection state: closed")
+        case .failed:
+            print("peerConnection new ice connection state: failed")
+        default:
+            break
+        }
+    }
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
+        switch (newState) {
+        case .new:
+            break
+        case .gathering:
+            break
+        case .complete:
+            if self._trickle == false {
+                self._my_sdp = self._pc.localDescription
+                self.sendSdp(self._sdp_cbks)
+            } else {
+                self.sendTrickleCandidate(nil)
+            }
+        default:
+            break
+        }
+        print("peerConnection new gathering state: \(newState)")
+    }
+    
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
+        if self._trickle == true {
+            self.sendTrickleCandidate(candidate)
+        }
+    }
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {
+    }
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {
+        print("peerConnection did add stream")
+        self._remote_stream = stream
+        self.onRemoteStream(stream)
+    }
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream) {
+        print("peerConnection did remove stream")
+    }
+    
+    public func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
+        
+    }
+    
+    public func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
+        print("peerConnection should negotiate")
     }
 }

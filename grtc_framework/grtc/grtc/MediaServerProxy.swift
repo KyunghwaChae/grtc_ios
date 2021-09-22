@@ -223,8 +223,8 @@ public class MediaServerProxy {
                 body["audio"].bool = true
                 body["video"].bool = true
                 body["data"].bool = true
-                //body["audiocodec"].string = "opus"
-                //body["videocodec"].string = "h264"
+                body["audiocodec"].string = "opus"
+                body["videocodec"].string = "vp8"
                 body["bitrate"].int32 = _parent._parent._vbitrate_mbps * 1024 * 1024
                 body["record"].bool = false
                 msg["message"].object = body.object
@@ -268,8 +268,8 @@ public class MediaServerProxy {
                 obj["room"].int32 = _parent._room_id
                 obj["publishers"].int = 9
                 obj["audiocodec"].string = "opus"
-                //obj["videocodec"].string = "h264"
-                //obj["h264_profile"].string = "42e01f"
+                obj["videocodec"].string = "vp8"
+//                obj["h264_profile"].string = "42e01f"
                 obj["is_private"].bool = false
                 msg["message"].object = obj.object
                 
@@ -408,6 +408,7 @@ public class MediaServerProxy {
         }
 
         public func onRemoteStream(_ stream: RTCMediaStream!) {
+            NSLog("[MediaServerProxy] onRemoteStream\n");
         }
 
         public func onDataOpen(_ data: AnyObject!) {
