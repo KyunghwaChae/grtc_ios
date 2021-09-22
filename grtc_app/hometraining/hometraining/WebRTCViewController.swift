@@ -30,6 +30,8 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
     public var bitrate: Int32!
     public var codes: [String]! = [String]()
     
+    private var cameraOn: Bool = true
+    private var micOn: Bool = true
     
     private var hometraining: MediaServerProxy! = nil
     private var remoteRenderers: [RTCVideoRenderer]! = [RTCVideoRenderer]()
@@ -102,6 +104,35 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
         containerView.layoutIfNeeded()
     }
     
+    @IBAction func onCameraClick(_ sender: UIButton) {
+        if let proxy = self.hometraining {
+            if self.cameraOn {
+                proxy.enableVideo(false)
+                sender.setImage(#imageLiteral(resourceName: "camera_off"), for: .normal)
+                self.cameraOn = false
+            } else {
+                proxy.enableVideo(true)
+                sender.setImage(#imageLiteral(resourceName: "camera_on"), for: .normal)
+                self.cameraOn = true
+            }
+        }
+    }
+    
+    @IBAction func onMicClick(_ sender: UIButton) {
+        if let proxy = self.hometraining {
+            if self.micOn {
+                proxy.enableAudio(false)
+                sender.setImage(#imageLiteral(resourceName: "mic_off"), for: .normal)
+                self.micOn = false
+            } else {
+                proxy.enableAudio(true)
+                sender.setImage(#imageLiteral(resourceName: "mic_on"), for: .normal)
+                self.micOn = true
+            }
+        }
+
+    }
+    
     func onCreatedRoom(_ sessionId: Int64!, _ publishId: Int64!) {
         DispatchQueue.main.async {
             let message = "Room is Created"
@@ -156,4 +187,5 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             self.present(alert, animated: true, completion: nil)
         }
     }
+
 }

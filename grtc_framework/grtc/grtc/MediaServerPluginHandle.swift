@@ -99,6 +99,10 @@ open class MediaServerPluginHandle: NSObject {
         _server.sendMessage(TransactionType.plugin_handle_message, _id, obj, _plugin)
     }
 
+    open func enableAudio(_ enable: Bool!) {
+        _audio_track.isEnabled = enable
+    }
+    
     open func enableVideo(_ enable: Bool!) {
         _video_track.isEnabled = enable
         if _data_channel.readyState == RTCDataChannelState.open {

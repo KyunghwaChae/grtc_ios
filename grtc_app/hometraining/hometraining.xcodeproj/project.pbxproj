@@ -10,6 +10,7 @@
 		84111DB226F81CBB00760B97 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 84111DB126F81CBB00760B97 /* Starscream */; };
 		84111DB726F81CDB00760B97 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 84111DB626F81CDB00760B97 /* SwiftyJSON */; };
 		84111DBA26F81CF800760B97 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 84111DB926F81CF800760B97 /* WebRTC */; };
+		842E2DA826FB59FF00790ECE /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 842E2DA726FB59FF00790ECE /* Alamofire */; };
 		845F0D0326F70CAE00A6F956 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845F0D0226F70CAE00A6F956 /* AppDelegate.swift */; };
 		845F0D0526F70CAE00A6F956 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845F0D0426F70CAE00A6F956 /* SceneDelegate.swift */; };
 		845F0D0726F70CAE00A6F956 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845F0D0626F70CAE00A6F956 /* ViewController.swift */; };
@@ -71,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				842E2DA826FB59FF00790ECE /* Alamofire in Frameworks */,
 				84111DB726F81CDB00760B97 /* SwiftyJSON in Frameworks */,
 				84111DBA26F81CF800760B97 /* WebRTC in Frameworks */,
 				84EBAA4726F7154D00DFDC4A /* grtc.framework in Frameworks */,
@@ -151,6 +153,7 @@
 				84111DB126F81CBB00760B97 /* Starscream */,
 				84111DB626F81CDB00760B97 /* SwiftyJSON */,
 				84111DB926F81CF800760B97 /* WebRTC */,
+				842E2DA726FB59FF00790ECE /* Alamofire */,
 			);
 			productName = hometraining;
 			productReference = 845F0CFF26F70CAE00A6F956 /* hometraining.app */;
@@ -183,6 +186,7 @@
 				84111DB026F81CBB00760B97 /* XCRemoteSwiftPackageReference "Starscream" */,
 				84111DB526F81CDB00760B97 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				84111DB826F81CF800760B97 /* XCRemoteSwiftPackageReference "WebRTC" */,
+				842E2DA626FB59FF00790ECE /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = 845F0D0026F70CAE00A6F956 /* Products */;
 			projectDirPath = "";
@@ -466,6 +470,14 @@
 				minimumVersion = 93.0.0;
 			};
 		};
+		842E2DA626FB59FF00790ECE /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -483,6 +495,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 84111DB826F81CF800760B97 /* XCRemoteSwiftPackageReference "WebRTC" */;
 			productName = WebRTC;
+		};
+		842E2DA726FB59FF00790ECE /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 842E2DA626FB59FF00790ECE /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -36,7 +36,6 @@ public class MediaServerProxy {
     private var _vbitrate_mbps: Int32 = 0
     private var _as_manager: Bool = false
     internal var _observer: MediaServerProxyObserver!
-    internal var _local_ms: RTCMediaStream!
     internal var _remote_ms: Dictionary<Int64, RTCMediaStream> = Dictionary<Int64, RTCMediaStream>()
 
     public init(_ localRenderer: RTCVideoRenderer!, _ remoteRenderers: [RTCVideoRenderer], _ remoteCodes: [String], _ mediaServerUri: String!, _ code: String!, _ roomId: Int32, _ width: Int32, _ height: Int32, _ fps: Int32, _ vbitrateMbps: Int32, _ asManager: Bool, _ observer: MediaServerProxyObserver!) {
@@ -57,18 +56,15 @@ public class MediaServerProxy {
         _media_server = MediaServer(MediaServerGlobalCallbacks(self))
     }
 
-    public func toggleMicOnOff() -> Bool {
-        if _local_ms != nil {
-            let enabled: Bool = _local_ms.audioTracks[0].isEnabled
-            _local_ms.audioTracks[0].isEnabled = !enabled
-            return !enabled
+    public func enableAudio(_ enable: Bool) {
+        if let handle = _handle {
+            handle.enableAudio(enable)
         }
-        return true
     }
-
-    public func setRemoteVolume(_ volume: Float64) {
-        for _ in _remote_ms.values {
-
+    
+    public func enableVideo(_ enable: Bool) {
+        if let handle = _handle {
+            handle.enableVideo(enable)
         }
     }
 
@@ -89,7 +85,6 @@ public class MediaServerProxy {
         
         class CreateAnswerCallbacks : IPluginHandleWebRTCCallbacks {
             
-            //private var _handle: MediaServerPluginHandle! = nil
             private var _renderer: RTCVideoRenderer! = nil
             private var _parent: SubscriberAttachCallbacks! = nil
             private var _jsep: JSON! = nil
