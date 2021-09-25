@@ -320,6 +320,16 @@ public class MediaServerProxy {
                     }
                 }
                 _parent._media_server.Attach(SubscriberAttachCallbacks(id, myrenderer, _parent))
+            } else {
+                if _parent._remote_codes[id] == nil {
+                    _parent._remote_codes[id] = code
+                }
+                if let observer = _parent._observer {
+                    let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                    handler.async {
+                        observer.onPublish(id, code)
+                    }
+                }
             }
         }
 
