@@ -187,5 +187,15 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             self.present(alert, animated: true, completion: nil)
         }
     }
+    
+    func onExistUser(_ code: String!) {
+        
+        DispatchQueue.main.async {
+            let message = "\(code!) is already join in this room"
+            let alert = UIAlertController(title: "onExistUser", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
 
 }

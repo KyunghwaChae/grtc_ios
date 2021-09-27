@@ -16,6 +16,7 @@ public protocol MediaServerProxyObserver {
     func onPublish(_ publishId: Int64!, _ code: String!)
     func onUnpublish(_ publishId: Int64!, _ code: String!)
     func onVideo(_ code: String!, _ enable: Bool!)
+    func onExistUser(_ code:String!);
 }
 
 public class MediaServerProxy {
@@ -302,6 +303,19 @@ public class MediaServerProxy {
             }
         }
 
+        private func listParticipants() {
+            if _parent._handle != nil {
+                var obj: JSON! = JSON()
+                var msg: JSON! = JSON()
+                
+                obj["request"].string = "listparticipants"
+                obj["room"].int32 = _parent._room_id
+                msg["message"].object = obj.object
+                
+                _parent._handle.sendMessage(PluginHandleSendMessageCallbacks(msg))
+            }
+        }
+        
         private func newRemoteFeed(_ id: Int64!, _ code: String!, _ bVideo: Bool!) {
             // todo attach the plugin as a listener
             if let myrenderer = _parent._remote_codes_renderers[code] {
@@ -339,11 +353,8 @@ public class MediaServerProxy {
 
         public func success(_ pluginHandle: MediaServerPluginHandle!) {
             _parent._handle = pluginHandle
-            if _parent._as_manager {
-                createRoom()
-            } else {
-                registerUsername()
-            }
+            listParticipants()
+
         }
 
         public func onMessage(_ msg: JSON!, _ jsepLocal: JSON!) {
@@ -352,7 +363,38 @@ public class MediaServerProxy {
             if event == "created" {
                 registerUsername()
             } else {
-                if event == "joined" {
+                if event == "participants" {
+                    var exist = false
+                    
+                    if msg["participants"].exists() {
+                        if let participants: [JSON] = msg["participants"].array {
+                            for participant in participants {
+                                if let code = participant["display"].string {
+                                    if code == _parent._code {
+                                        exist = true
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if(exist) {
+                        if let observer = _parent._observer {
+                            let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                            handler.async {
+                                observer.onExistUser(self._parent._code)
+                            }
+                        }
+                    } else {
+                        if _parent._as_manager {
+                            createRoom()
+                        } else {
+                            registerUsername()
+                        }
+                    }
+                
+                } else if event == "joined" {
                     _parent._my_id = msg["id"].int64
                     publishOwnFeed()
                     if msg["publishers"].exists() {
