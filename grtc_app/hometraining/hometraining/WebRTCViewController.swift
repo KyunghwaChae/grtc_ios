@@ -89,6 +89,11 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
         self.hometraining.Start()
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.hometraining.Stop()
+    }
+    
     private func embedView(_ view: UIView, into containerView: UIView) {
         containerView.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false

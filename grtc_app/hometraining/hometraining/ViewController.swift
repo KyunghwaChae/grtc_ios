@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         case 0:
             participantCode.text = "teacher"
             bitrate.text = "2"
-            participantCodes.text = "aaa;bbb;ccc;ddd;eee;fff;ggg;hhh"
+            participantCodes.text = "aaa;bbb;ccc;ddd;eee;fff;ggg"
 //            participantCodes.text = "aaa"
         case 1:
             participantCode.text = "aaa"

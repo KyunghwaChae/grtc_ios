@@ -355,6 +355,11 @@ open class MediaServerPluginHandle: NSObject {
     }
 
     open func hangUp() {
+        
+        if let callbacks = _callbacks {
+            callbacks.onCleanup()
+        }
+        
         if let capturer = _capturer as? RTCCameraVideoCapturer {
             capturer.stopCapture()
         }

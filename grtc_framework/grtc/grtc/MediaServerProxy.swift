@@ -133,9 +133,20 @@ public class MediaServerProxy {
             _parent = parent
         }
 
-
         public func getFeedId() -> Int64! {
             return _feedid
+        }
+        
+        private func leave() {
+            if _parent._handle != nil {
+                var obj: JSON! = JSON()
+                var msg: JSON! = JSON()
+                
+                obj["request"].string = "leave"
+                msg["message"].object = obj.object
+                
+                _parent._handle.sendMessage(PluginHandleSendMessageCallbacks(msg))
+            }
         }
 
         public func success(_ handle: MediaServerPluginHandle!) {
@@ -197,6 +208,7 @@ public class MediaServerProxy {
         }
 
         public func onCleanup() {
+            leave()
         }
 
         public func onDetached() {
@@ -316,6 +328,18 @@ public class MediaServerProxy {
             }
         }
         
+        private func leave() {
+            if _parent._handle != nil {
+                var obj: JSON! = JSON()
+                var msg: JSON! = JSON()
+                
+                obj["request"].string = "leave"
+                msg["message"].object = obj.object
+                
+                _parent._handle.sendMessage(PluginHandleSendMessageCallbacks(msg))
+            }
+        }
+        
         private func newRemoteFeed(_ id: Int64!, _ code: String!, _ bVideo: Bool!) {
             // todo attach the plugin as a listener
             if let myrenderer = _parent._remote_codes_renderers[code] {
@@ -353,122 +377,120 @@ public class MediaServerProxy {
 
         public func success(_ pluginHandle: MediaServerPluginHandle!) {
             _parent._handle = pluginHandle
-            listParticipants()
-
+            if self._parent._as_manager {
+                createRoom()
+            } else {
+                listParticipants()
+            }
         }
 
         public func onMessage(_ msg: JSON!, _ jsepLocal: JSON!) {
 
             let event: String! = msg["videoroom"].rawString()
-            if event == "created" {
-                registerUsername()
-            } else {
-                if event == "participants" {
-                    var exist = false
-                    
-                    if msg["participants"].exists() {
-                        if let participants: [JSON] = msg["participants"].array {
-                            for participant in participants {
-                                if let code = participant["display"].string {
-                                    if code == _parent._code {
-                                        exist = true
-                                        break
-                                    }
+            if event == "participants" {
+                var exist = false
+                
+                if msg["participants"].exists() {
+                    if let participants: [JSON] = msg["participants"].array {
+                        for participant in participants {
+                            if let code = participant["display"].string {
+                                if code == _parent._code {
+                                    exist = true
+                                    break
                                 }
                             }
                         }
                     }
-                    
-                    if(exist) {
-                        if let observer = _parent._observer {
-                            let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
-                            handler.async {
-                                observer.onExistUser(self._parent._code)
-                            }
-                        }
-                    } else {
-                        if _parent._as_manager {
-                            createRoom()
-                        } else {
-                            registerUsername()
-                        }
-                    }
+                }
                 
-                } else if event == "joined" {
-                    _parent._my_id = msg["id"].int64
-                    publishOwnFeed()
-                    if msg["publishers"].exists() {
-                        
-                        if let pubs: [JSON] = msg["publishers"].array {
-                            for pub in pubs {
-                                let tehId: Int64! = pub["id"].int64
-                                let code: String! = pub["display"].string
-                                newRemoteFeed(tehId, code, true)
-                            }
-                        }
-                    }
-                    if _parent._as_manager {
-                        if let observer = _parent._observer {
-                            let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
-                            handler.async {
-                                observer.onCreatedRoom(self._parent._media_server.getSessionId(), self._parent._my_id)
-                            }
-                        }
-                    } else {
-                        if let observer = _parent._observer {
-                            let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
-                            handler.async {
-                                observer.onJoinedRoom(self._parent._media_server.getSessionId(), self._parent._my_id)
-                            }
+                if(exist) {
+                    if let observer = _parent._observer {
+                        let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                        handler.async {
+                            observer.onExistUser(self._parent._code)
                         }
                     }
                 } else {
-                    if event == "destroyed" {
-                        
-                    } else {
-                        
-                        if event == "event"  {
-                            if msg["publishers"].exists() {
-                                let pubs: [JSON] = msg["publishers"].arrayValue
-                                for i in 0 ... pubs.count - 1 {
-                                    let pub: JSON! = pubs[i]
-                                    newRemoteFeed(pub["id"].int64, pub["display"].string, true)
-                                }
-                            } else {
-                                if msg["leaving"].exists() {
-                                    if let id = msg["leaving"].int64 {
-                                        if _parent._remote_renderers.keys.contains(id) {
-                                            _parent._remote_renderers.removeValue(forKey: id)
-                                        }
-
-                                        if let observer = _parent._observer {
+                    registerUsername()
+                }
+            } else if event == "created" {
+                listParticipants()
+            } else if event == "joined" {
+                _parent._my_id = msg["id"].int64
+                publishOwnFeed()
+                if msg["publishers"].exists() {
+                    
+                    if let pubs: [JSON] = msg["publishers"].array {
+                        for pub in pubs {
+                            let tehId: Int64! = pub["id"].int64
+                            let code: String! = pub["display"].string
+                            newRemoteFeed(tehId, code, true)
+                        }
+                    }
+                }
+                if _parent._as_manager {
+                    if let observer = _parent._observer {
+                        let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                        handler.async {
+                            observer.onCreatedRoom(self._parent._media_server.getSessionId(), self._parent._my_id)
+                        }
+                    }
+                } else {
+                    if let observer = _parent._observer {
+                        let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                        handler.async {
+                            observer.onJoinedRoom(self._parent._media_server.getSessionId(), self._parent._my_id)
+                        }
+                    }
+                }
+            } else {
+                if event == "destroyed" {
+                    
+                } else {
+                    
+                    if event == "event"  {
+                        if msg["publishers"].exists() {
+                            let pubs: [JSON] = msg["publishers"].arrayValue
+                            for i in 0 ... pubs.count - 1 {
+                                let pub: JSON! = pubs[i]
+                                newRemoteFeed(pub["id"].int64, pub["display"].string, true)
+                            }
+                        } else {
+                            if msg["leaving"].exists() {
+                                if let id = msg["leaving"].int64 {
+                                    if _parent._remote_renderers.keys.contains(id) {
+                                        _parent._remote_renderers.removeValue(forKey: id)
+                                    }
+                                    
+                                    if let observer = _parent._observer {
+                                        if self._parent._remote_codes.keys.contains(id) {
+                                            let code = self._parent._remote_codes[id]
                                             let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
                                             handler.async {
-                                                if self._parent._remote_codes.keys.contains(id) {
-                                                    observer.onLeaveRoom(id, self._parent._remote_codes[id])
-                                                }
+                                                observer.onLeaveRoom(id, code)
+                                                
                                             }
                                         }
-                                        _parent._media_server.Detach(id)
                                     }
-                                } else {
-                                    if msg["unpublished"].exists() {
-                                        if let id = msg["unpublished"].int64 {
-                                            if let observer = _parent._observer {
+                                    _parent._media_server.Detach(id)
+                                }
+                            } else {
+                                if msg["unpublished"].exists() {
+                                    if let id = msg["unpublished"].int64 {
+                                        if let observer = _parent._observer {
+                                            if self._parent._remote_codes.keys.contains(id) {
+                                                let code = self._parent._remote_codes[id]
                                                 let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
                                                 handler.async {
-                                                    if self._parent._remote_codes.keys.contains(id) {
-                                                        observer.onUnpublish(id, self._parent._remote_codes[id])
-                                                    }
+                                                    observer.onUnpublish(id, code)
                                                 }
                                             }
                                         }
-                                    } else {
-                                        if msg["error_code"].exists() {
-                                            if msg["error_code"].int == 427 {
-                                                // room alreay exists
-                                                registerUsername()
-                                            }
+                                    }
+                                } else {
+                                    if msg["error_code"].exists() {
+                                        if msg["error_code"].int == 427 { // room alreay exists
+                                            listParticipants()
                                         }
                                     }
                                 }
@@ -499,6 +521,7 @@ public class MediaServerProxy {
         }
 
         public func onCleanup() {
+            leave()
         }
 
         public func getPlugin() -> MediaServerSupportedPluginPackages! {

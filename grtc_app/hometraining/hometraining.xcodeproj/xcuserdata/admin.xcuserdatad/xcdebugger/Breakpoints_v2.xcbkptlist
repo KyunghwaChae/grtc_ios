@@ -638,8 +638,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "374"
-            endingLineNumber = "374"
+            startingLineNumber = "379"
+            endingLineNumber = "379"
             landmarkName = "hangUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -654,8 +654,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "469"
-            endingLineNumber = "469"
+            startingLineNumber = "474"
+            endingLineNumber = "474"
             landmarkName = "peerConnection(_:didChange:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -670,8 +670,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "504"
-            endingLineNumber = "504"
+            startingLineNumber = "509"
+            endingLineNumber = "509"
             landmarkName = "peerConnection(_:didChange:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -686,8 +686,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "495"
-            endingLineNumber = "495"
+            startingLineNumber = "500"
+            endingLineNumber = "500"
             landmarkName = "peerConnection(_:didChange:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1084,8 +1084,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "520"
-            endingLineNumber = "520"
+            startingLineNumber = "525"
+            endingLineNumber = "525"
             landmarkName = "peerConnection(_:didAdd:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1100,8 +1100,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "526"
-            endingLineNumber = "526"
+            startingLineNumber = "531"
+            endingLineNumber = "531"
             landmarkName = "peerConnection(_:didRemove:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1116,8 +1116,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "378"
-            endingLineNumber = "378"
+            startingLineNumber = "383"
+            endingLineNumber = "383"
             landmarkName = "detach()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1164,8 +1164,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "379"
-            endingLineNumber = "379"
+            startingLineNumber = "384"
+            endingLineNumber = "384"
             landmarkName = "detach()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1180,8 +1180,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "380"
-            endingLineNumber = "380"
+            startingLineNumber = "385"
+            endingLineNumber = "385"
             landmarkName = "detach()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1212,8 +1212,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "553"
-            endingLineNumber = "553"
+            startingLineNumber = "558"
+            endingLineNumber = "558"
             landmarkName = "dataChannel(_:didReceiveMessageWith:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1228,8 +1228,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "552"
-            endingLineNumber = "552"
+            startingLineNumber = "557"
+            endingLineNumber = "557"
             landmarkName = "dataChannel(_:didReceiveMessageWith:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1244,8 +1244,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "548"
-            endingLineNumber = "548"
+            startingLineNumber = "553"
+            endingLineNumber = "553"
             landmarkName = "dataChannel(_:didReceiveMessageWith:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1260,8 +1260,8 @@
             filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "531"
-            endingLineNumber = "531"
+            startingLineNumber = "536"
+            endingLineNumber = "536"
             landmarkName = "peerConnection(_:didOpen:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1276,9 +1276,57 @@
             filePath = "hometraining/WebRTCViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "184"
-            endingLineNumber = "184"
+            startingLineNumber = "189"
+            endingLineNumber = "189"
             landmarkName = "onVideo(_:_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C79D3EEC-4215-40DF-AC3F-EDC2A2FAD618"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "hometraining/WebRTCViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "94"
+            endingLineNumber = "94"
+            landmarkName = "viewDidDisappear(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2ADDACA0-427F-407C-B287-F78722F69681"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../grtc_framework/grtc/grtc/MediaServerPluginHandle.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "359"
+            endingLineNumber = "359"
+            landmarkName = "hangUp()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "37714ED3-8FD8-4683-9EA8-4354B325ED22"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../grtc_framework/grtc/grtc/MediaServerProxy.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
+            landmarkName = "init(_:_:_:_:_:_:_:_:_:_:_:_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
