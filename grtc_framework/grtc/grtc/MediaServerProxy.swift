@@ -16,7 +16,7 @@ public protocol MediaServerProxyObserver {
     func onPublish(_ publishId: Int64!, _ code: String!)
     func onUnpublish(_ publishId: Int64!, _ code: String!)
     func onVideo(_ code: String!, _ enable: Bool!)
-    func onExistUser(_ code:String!);
+    func onExistUser(_ code:String!)
 }
 
 public class MediaServerProxy {
@@ -353,6 +353,7 @@ public class MediaServerProxy {
                 if let observer = _parent._observer {
                     let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
                     handler.async {
+                        
                         observer.onPublish(id, code)
                         observer.onVideo(code, bVideo)
                     }
