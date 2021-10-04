@@ -382,7 +382,12 @@ open class MediaServerPluginHandle: NSObject {
     public func detach() {
         hangUp()
         var obj: JSON! = JSON()
-        _server.sendMessage(&obj, MediaServerMessageType.detach, _id)
+        
+        let handler = DispatchQueue(label: "kr.co.grib.detach", qos: .userInteractive)
+        handler.async {
+            self._server.sendMessage(&obj, MediaServerMessageType.detach, self._id)
+        }
+        
     }
 
     public func getFeedId() -> Int64! {
