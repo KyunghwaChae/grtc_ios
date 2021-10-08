@@ -56,9 +56,9 @@ class ViewController: UIViewController {
             webRTCVC.roomid = Int32(roomid)
         }
         if participantType.selectedSegmentIndex == 0 {
-            webRTCVC.isManager = true
+            webRTCVC.isTeacher = true
         } else {
-            webRTCVC.isManager = false
+            webRTCVC.isTeacher = false
         }
         if let code = self.participantCode.text {
             webRTCVC.code = code

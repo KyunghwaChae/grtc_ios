@@ -17,6 +17,7 @@ public protocol MediaServerProxyObserver {
     func onUnpublish(_ publishId: Int64!, _ code: String!)
     func onVideo(_ code: String!, _ enable: Bool!)
     func onExistUser(_ code:String!)
+    func onExitUser()
 }
 
 public class MediaServerProxy {
@@ -35,11 +36,12 @@ public class MediaServerProxy {
     private var _height: Int32 = 0
     private var _fps: Int32 = 0
     private var _vbitrate_mbps: Int32 = 0
-    private var _as_manager: Bool = false
+    private var _bRecord: Bool = false
+    private var _bForceJoin: Bool = false
     internal var _observer: MediaServerProxyObserver!
     internal var _remote_ms: Dictionary<Int64, RTCMediaStream> = Dictionary<Int64, RTCMediaStream>()
 
-    public init(_ localRenderer: RTCVideoRenderer!, _ remoteRenderers: [RTCVideoRenderer], _ remoteCodes: [String], _ mediaServerUri: String!, _ code: String!, _ roomId: Int32, _ width: Int32, _ height: Int32, _ fps: Int32, _ vbitrateMbps: Int32, _ asManager: Bool, _ observer: MediaServerProxyObserver!) {
+    public init(_ localRenderer: RTCVideoRenderer!, _ remoteRenderers: [RTCVideoRenderer], _ remoteCodes: [String], _ mediaServerUri: String!, _ code: String!, _ roomId: Int32, _ width: Int32, _ height: Int32, _ fps: Int32, _ vbitrateMbps: Int32, _ bRecord: Bool, _ bForceJoin: Bool, _ observer: MediaServerProxyObserver!) {
         
         _local_renderer = localRenderer
         for (index, value) in remoteCodes.enumerated() {
@@ -52,7 +54,8 @@ public class MediaServerProxy {
         _height = height
         _fps = fps
         _vbitrate_mbps = vbitrateMbps
-        _as_manager = asManager
+        _bRecord = bRecord
+        _bForceJoin = bForceJoin
         _observer = observer
         _media_server = MediaServer(MediaServerGlobalCallbacks(self))
     }
@@ -226,7 +229,7 @@ public class MediaServerProxy {
     internal class MediaServerPublisherPluginCallbacks : IMediaServerPluginCallbacks {
         
         private let _parent: MediaServerProxy!
-        
+        private var _bRoomCreator: Bool! = false
         init(_ parent: MediaServerProxy!) {
             _parent = parent
         }
@@ -246,10 +249,16 @@ public class MediaServerProxy {
                 body["audio"].bool = true
                 body["video"].bool = true
                 body["data"].bool = true
-                body["audiocodec"].string = "opus"
-                body["videocodec"].string = "vp8"
+                //body["audiocodec"].string = "opus"
+                //body["videocodec"].string = "vp8"
                 body["bitrate"].int32 = _parent._parent._vbitrate_mbps * 1024 * 1024
-                body["record"].bool = false
+                /*
+                if self._parent._parent._bRecord {
+                    body["record"].bool = true
+                } else {
+                    body["record"].bool = false
+                }
+                */
                 msg["message"].object = body.object
                 msg["jsep"].object = obj.object
                 _parent._parent._handle.sendMessage(PluginHandleSendMessageCallbacks(msg))
@@ -290,10 +299,11 @@ public class MediaServerProxy {
                 obj["request"].string = "create"
                 obj["room"].int32 = _parent._room_id
                 obj["publishers"].int = 9
-                obj["audiocodec"].string = "opus"
-                obj["videocodec"].string = "vp8"
-//                obj["h264_profile"].string = "42e01f"
+                //obj["audiocodec"].string = "opus"
+                //obj["videocodec"].string = "vp8"
+                //obj["h264_profile"].string = "42e01f"
                 obj["is_private"].bool = false
+                obj["rec_dir"].string = "/home/ubuntu/recording/\(self._parent._room_id)"
                 msg["message"].object = obj.object
                 
                 _parent._handle.sendMessage(PluginHandleSendMessageCallbacks(msg))
@@ -378,11 +388,7 @@ public class MediaServerProxy {
 
         public func success(_ pluginHandle: MediaServerPluginHandle!) {
             _parent._handle = pluginHandle
-            if self._parent._as_manager {
-                createRoom()
-            } else {
-                listParticipants()
-            }
+            createRoom()
         }
 
         public func onMessage(_ msg: JSON!, _ jsepLocal: JSON!) {
@@ -415,7 +421,12 @@ public class MediaServerProxy {
                     registerUsername()
                 }
             } else if event == "created" {
-                listParticipants()
+                self._bRoomCreator = true
+                if self._parent._bForceJoin {
+                    registerUsername()
+                } else {
+                    listParticipants()
+                }
             } else if event == "joined" {
                 _parent._my_id = msg["id"].int64
                 publishOwnFeed()
@@ -429,7 +440,7 @@ public class MediaServerProxy {
                         }
                     }
                 }
-                if _parent._as_manager {
+                if self._bRoomCreator {
                     if let observer = _parent._observer {
                         let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
                         handler.async {
@@ -454,7 +465,18 @@ public class MediaServerProxy {
                             let pubs: [JSON] = msg["publishers"].arrayValue
                             for i in 0 ... pubs.count - 1 {
                                 let pub: JSON! = pubs[i]
-                                newRemoteFeed(pub["id"].int64, pub["display"].string, true)
+                                let theId = pub["id"].int64
+                                let code = pub["display"].string
+                                if code==self._parent._code {
+                                    if let observer = _parent._observer {
+                                        let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
+                                        handler.async {
+                                            observer.onExitUser()
+                                        }
+                                    }
+                                } else {
+                                    newRemoteFeed(theId, code, true)
+                                }
                             }
                         } else {
                             if msg["leaving"].exists() {
@@ -491,7 +513,12 @@ public class MediaServerProxy {
                                 } else {
                                     if msg["error_code"].exists() {
                                         if msg["error_code"].int == 427 { // room alreay exists
-                                            listParticipants()
+                                            self._bRoomCreator = false
+                                            if self._parent._bForceJoin {
+                                                registerUsername()
+                                            } else {
+                                                listParticipants()
+                                            }
                                         }
                                     }
                                 }
@@ -587,10 +614,6 @@ public class MediaServerProxy {
         
         open func getCode() -> String! {
             return _parent._code;
-        }
-        
-        open func isManager() -> Bool! {
-            return _parent._as_manager
         }
     }
 }

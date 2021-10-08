@@ -19,5 +19,4 @@ public protocol IMediaServerGatewayCallbacks : IMediaServerCallbacks {
     func getHeight() -> Int32!
     func getFPS() -> Int32!
     func getCode() -> String!
-    func isManager() -> Bool!
 }

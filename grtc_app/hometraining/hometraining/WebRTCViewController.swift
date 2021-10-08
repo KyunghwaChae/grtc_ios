@@ -23,7 +23,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
     
     
     public var roomid: Int32!
-    public var isManager: Bool!
+    public var isTeacher: Bool!
     public var code: String!
     public var width: Int32!
     public var height: Int32!
@@ -39,7 +39,15 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view."
-        
+        self.internalStart(false)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.internalStop()
+    }
+    
+    private func internalStart(_ bForceJoin: Bool) {
         #if arch(arm64)
         let localRenderer = RTCMTLVideoView(frame: self.localVideoView.frame)
         let remoteRenderer1 = RTCMTLVideoView(frame: self.remoteVideoView1.frame)
@@ -74,8 +82,8 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
         remoteRenderers.append(remoteRenderer5)
         remoteRenderers.append(remoteRenderer6)
         remoteRenderers.append(remoteRenderer7)
-        
-        
+
+
         self.embedView(localRenderer, into: self.localVideoView)
         self.embedView(remoteRenderer1, into: self.remoteVideoView1)
         self.embedView(remoteRenderer2, into: self.remoteVideoView2)
@@ -84,13 +92,12 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
         self.embedView(remoteRenderer5, into: self.remoteVideoView5)
         self.embedView(remoteRenderer6, into: self.remoteVideoView6)
         self.embedView(remoteRenderer7, into: self.remoteVideoView7)
-        
-        self.hometraining = MediaServerProxy(localRenderer, remoteRenderers, self.codes, "https://webrtc-dev.markx.co.kr", self.code, self.roomid, self.width, self.height, 30, self.bitrate, self.isManager, self)
+
+        self.hometraining = MediaServerProxy(localRenderer, remoteRenderers, self.codes, "https://webrtc-dev.markx.co.kr", self.code, self.roomid, self.width, self.height, 30, self.bitrate, self.isTeacher, bForceJoin, self)
         self.hometraining.Start()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+    private func internalStop() {
         self.hometraining.Stop()
     }
     
@@ -200,6 +207,20 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onExistUser", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            
+            self.internalStop()
+            self.internalStart(true)
+        }
+    }
+    
+    func onExitUser() {
+        DispatchQueue.main.async {
+            let message = "Same User login through Other Device"
+            let alert = UIAlertController(title: "onExistUser", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+            
+            self.presentingViewController?.dismiss(animated: true)
         }
     }
 
