@@ -387,7 +387,6 @@ open class MediaServerPluginHandle: NSObject {
         handler.async {
             self._server.sendMessage(&obj, MediaServerMessageType.detach, self._id)
         }
-        
     }
 
     public func getFeedId() -> Int64! {

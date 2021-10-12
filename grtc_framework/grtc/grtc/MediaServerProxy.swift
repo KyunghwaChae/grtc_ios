@@ -141,14 +141,14 @@ public class MediaServerProxy {
         }
         
         private func leave() {
-            if _parent._handle != nil {
+            if self._handle != nil {
                 var obj: JSON! = JSON()
                 var msg: JSON! = JSON()
                 
                 obj["request"].string = "leave"
                 msg["message"].object = obj.object
                 
-                _parent._handle.sendMessage(PluginHandleSendMessageCallbacks(msg))
+                self._handle.sendMessage(PluginHandleSendMessageCallbacks(msg))
             }
         }
 
@@ -491,7 +491,6 @@ public class MediaServerProxy {
                                             let handler = DispatchQueue(label: "kr.co.grib.observer", qos: .userInteractive)
                                             handler.async {
                                                 observer.onLeaveRoom(id, code)
-                                                
                                             }
                                         }
                                     }

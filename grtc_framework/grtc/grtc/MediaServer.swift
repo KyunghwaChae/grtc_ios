@@ -77,6 +77,7 @@ open class MediaServer : IMediaServerMessageObserver, IMediaServerSessionCreatio
                 if (!_connected) || (_server_connection.getMessengerType() == MediaServerMessengerType.websocket) {
                     return
                 }
+                
                 _server_connection.longPoll(_session_id)
             } else {
                 
@@ -161,12 +162,13 @@ open class MediaServer : IMediaServerMessageObserver, IMediaServerSessionCreatio
             for (_, v) in _attached_plugins {
                 if v.getFeedId()==id {
                     attachedPlugin = v
+                    break
                 }
             }
         }
         
         if let v = attachedPlugin {
-            v.detach()
+           v.detach()
         }
     }
 
@@ -259,10 +261,12 @@ open class MediaServer : IMediaServerMessageObserver, IMediaServerSessionCreatio
     // region MessageObserver
     open func receivedNewMessage(_ obj: JSON!) {
         
+        /*
         if let debug = obj {
             print("-------receivedNewMessage--------")
             print(debug)
         }
+        */
         
         let type: MediaServerMessageType! = MediaServerMessageType(rawValue: obj["janus"].rawString()!)
         var transaction: String! = nil
@@ -360,7 +364,7 @@ open class MediaServer : IMediaServerMessageObserver, IMediaServerSessionCreatio
 
     open func onSessionCreationSuccess(_ obj: JSON!) {
         _session_id = obj["data"]["id"].int64
-        _keep_alive = DispatchQueue(label: "kr.co.grib.queue", qos: .background)
+        _keep_alive = DispatchQueue(label: "kr.co.grib.longpoll", qos: .userInitiated)
         _keep_alive.async {
             self.run()
         }

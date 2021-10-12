@@ -39,6 +39,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view."
+        definesPresentationContext = true
         self.internalStart(false)
     }
     
@@ -93,7 +94,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
         self.embedView(remoteRenderer6, into: self.remoteVideoView6)
         self.embedView(remoteRenderer7, into: self.remoteVideoView7)
 
-        self.hometraining = MediaServerProxy(localRenderer, remoteRenderers, self.codes, "https://webrtc-dev.markx.co.kr", self.code, self.roomid, self.width, self.height, 30, self.bitrate, self.isTeacher, bForceJoin, self)
+        self.hometraining = MediaServerProxy(localRenderer, remoteRenderers, self.codes, "https://webrtc.seers-visual-system.link", self.code, self.roomid, self.width, self.height, 30, self.bitrate, self.isTeacher, bForceJoin, self)
         self.hometraining.Start()
     }
     
@@ -151,6 +152,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onCreatedRoom", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            //alert.dismiss(animated: true)
         }
     }
     
@@ -160,6 +162,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onJoinedRoom", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            //alert.dismiss(animated: true)
         }
     }
     
@@ -169,6 +172,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onLeaveRoom", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            //alert.dismiss(animated: true)
         }
     }
     
@@ -178,6 +182,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onPublish", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            //alert.dismiss(animated: true)
         }
     }
     
@@ -187,6 +192,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onUnpublish", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            //alert.dismiss(animated: true)
         }
     }
     
@@ -197,6 +203,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onVideo", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            //alert.dismiss(animated: true)
         }
     }
     
@@ -207,6 +214,7 @@ class WebRTCViewController: UIViewController, MediaServerProxyObserver {
             let alert = UIAlertController(title: "onExistUser", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            //alert.dismiss(animated: true)
             
             self.internalStop()
             self.internalStart(true)
